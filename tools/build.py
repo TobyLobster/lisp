@@ -53,8 +53,8 @@ def copy_files(files_to_copy):
         safe_copy("original/" + file, "build/disk/" + file)
         safe_copy("original/" + file + ".inf", "build/disk/" + file + ".inf")
 
-def disassemble_binary(python_filename, asm_filename):
-    args = ["python3", python_filename, "-a"]
+def disassemble_binary(python_filename, asm_filename, option):
+    args = ["python3", python_filename, option]
     result_bytes = run(args, "disassemble failed")
     with open(asm_filename, 'wb') as f:
         f.write(result_bytes)
@@ -224,10 +224,12 @@ for file in original_bin_filepaths:
 
     load_address, exec_address = read_inf(file + ".inf")
 
-    asm_filepath = "source/" + output_bin_filename_no_extension + ".asm"
+    acme_asm_filepath = "source/" + output_bin_filename_no_extension + "_acme.asm"
+    beebasm_asm_filepath = "source/" + output_bin_filename_no_extension + "_beebasm.asm"
     py_filepath  = "source/" + output_bin_filename_no_extension + ".py"
-    disassemble_binary(py_filepath, asm_filepath)
-    assemble_binary(asm_filepath, output_bin_filepath)
+    disassemble_binary(py_filepath, acme_asm_filepath, "--acme")
+    disassemble_binary(py_filepath, beebasm_asm_filepath, "--beebasm")
+    assemble_binary(acme_asm_filepath, output_bin_filepath)
     post_process_binary(output_bin_filepath)
     check_diffs(file, output_bin_filepath)
 
